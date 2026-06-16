@@ -1,0 +1,2 @@
+-- Local development seed data (schema is applied via migrations).
+-- Admin user is created via: pnpm seed:admin:local

@@ -1,0 +1,33 @@
+# Supabase local development config
+# See https://supabase.com/docs/guides/cli/config
+
+project_id = "polla"
+
+[api]
+enabled = true
+port = 54321
+
+[db]
+port = 54322
+major_version = 15
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[studio]
+enabled = true
+port = 54323
+
+[auth]
+enabled = true
+# Block public self-registration; admin is seeded via scripts/seed-admin.mjs
+enable_signup = false
+site_url = "http://localhost:5173"
+additional_redirect_urls = ["http://127.0.0.1:5173"]
+
+[auth.email]
+# Must be true for email/password login to work (invite-only local dev).
+# Public signup is controlled by [auth].enable_signup above.
+enable_signup = true
+enable_confirmations = false
