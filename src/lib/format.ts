@@ -1,5 +1,11 @@
 const currency = import.meta.env.VITE_CURRENCY ?? "COP";
 const locale = import.meta.env.VITE_LOCALE ?? "es-CO";
+export const appTimeZone =
+  import.meta.env.VITE_TIMEZONE ?? "America/Argentina/Buenos_Aires";
+
+export function todayInAppTz(): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: appTimeZone }).format(new Date());
+}
 
 export function formatCurrency(value: number): string {
   return new Intl.NumberFormat(locale, {
@@ -31,6 +37,7 @@ export function formatDateTime(date: string | Date): string {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
+    timeZone: appTimeZone,
   }).format(parseDateInput(date));
 }
 

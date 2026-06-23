@@ -30,14 +30,20 @@ export const drawSchema = z.object({
   numbers: drawNumbersSchema,
 });
 
+export const dateStringSchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha inválida (AAAA-MM-DD)");
+
 export const gameSchema = z.object({
   label: z.string().trim().max(100).optional().or(z.literal("")),
+  startDate: dateStringSchema.optional(),
   entryFee: z.coerce.number().min(0).optional(),
   prizePercent: z.coerce.number().min(0.01).max(1).optional(),
 });
 
 export const updateGameSchema = z.object({
   label: z.string().trim().min(1, "Nombre requerido").max(100),
+  startDate: dateStringSchema,
   entryFee: z.coerce.number().min(0, "Cuota mínima 0"),
   prizePercent: z.coerce
     .number()

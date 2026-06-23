@@ -47,6 +47,7 @@ const FIELD_LABELS: Record<string, string> = {
   nickname: "Apodo",
   label: "Nombre del juego",
   draw_date: "Fecha del sorteo",
+  start_date: "Fecha de inicio",
   new_matches: "Aciertos nuevos",
   retroactive_matches: "Aciertos retroactivos",
   reason: "Motivo",
@@ -86,7 +87,7 @@ export function auditEntityLabel(entityType: string): string {
 function formatFieldValue(key: string, value: unknown): string {
   if (value === null || value === undefined) return "—";
 
-  if (key === "draw_date" && typeof value === "string") {
+  if ((key === "draw_date" || key === "start_date") && typeof value === "string") {
     return formatDate(value);
   }
   if (

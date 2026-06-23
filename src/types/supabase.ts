@@ -195,6 +195,7 @@ export interface Database {
           p_label?: string;
           p_entry_fee?: number;
           p_prize_percent?: number;
+          p_start_date?: string;
         };
         Returns: string;
       };
@@ -204,6 +205,7 @@ export interface Database {
           p_label?: string;
           p_entry_fee?: number;
           p_prize_percent?: number;
+          p_start_date?: string;
         };
         Returns: undefined;
       };

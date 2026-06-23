@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { todayInAppTz } from "@/lib/format";
 import { useState } from "react";
 import {
   normalizeSlots,
@@ -42,13 +43,18 @@ export function NumberInputGrid({
 
 function nextAvailableDrawDate(usedDates: string[]): string {
   const used = new Set(usedDates);
-  const date = new Date();
+  const [year, month, day] = todayInAppTz().split("-").map(Number);
+  const date = new Date(year, month - 1, day);
   for (let i = 0; i < 366; i += 1) {
-    const iso = date.toISOString().slice(0, 10);
+    const iso = [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, "0"),
+      String(date.getDate()).padStart(2, "0"),
+    ].join("-");
     if (!used.has(iso)) return iso;
     date.setDate(date.getDate() + 1);
   }
-  return new Date().toISOString().slice(0, 10);
+  return todayInAppTz();
 }
 
 export function DrawEntryForm({

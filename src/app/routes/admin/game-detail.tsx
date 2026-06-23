@@ -17,7 +17,7 @@ import {
 } from "@/features/games/hooks";
 import { closeGame, openGame, updateGame } from "@/features/admin/mutations";
 import { useQueryClient } from "@tanstack/react-query";
-import { displayGameLabel, formatCurrency, formatPercent, gameStatusLabel } from "@/lib/format";
+import { displayGameLabel, formatCurrency, formatDate, formatPercent, gameStatusLabel } from "@/lib/format";
 import {
   updateGameSchema,
   type UpdateGameFormValues,
@@ -48,6 +48,7 @@ export function AdminGameDetailPage() {
     if (game) {
       reset({
         label: game.label,
+        startDate: game.start_date,
         entryFee: Number(game.entry_fee),
         prizePercent: Number(game.prize_percent),
       });
@@ -102,6 +103,7 @@ export function AdminGameDetailPage() {
     try {
       await updateGame(game.id, {
         label: values.label,
+        startDate: values.startDate,
         entryFee: values.entryFee,
         prizePercent: values.prizePercent,
       });
@@ -181,6 +183,13 @@ export function AdminGameDetailPage() {
                 )}
               </div>
               <div>
+                <Label htmlFor="startDate">Fecha de inicio</Label>
+                <Input id="startDate" type="date" {...register("startDate")} />
+                {errors.startDate && (
+                  <p className="mt-1 text-sm text-destructive">{errors.startDate.message}</p>
+                )}
+              </div>
+              <div>
                 <Label htmlFor="entryFee">Cuota de entrada</Label>
                 <Input
                   id="entryFee"
@@ -230,10 +239,14 @@ export function AdminGameDetailPage() {
             <CardTitle>Configuración del juego</CardTitle>
             <CardDescription>Solo lectura.</CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-2 text-sm sm:grid-cols-3">
+          <CardContent className="grid gap-2 text-sm sm:grid-cols-4">
             <p>
               <span className="text-muted-foreground">Nombre: </span>
               {displayGameLabel(game.label)}
+            </p>
+            <p>
+              <span className="text-muted-foreground">Inicio: </span>
+              {formatDate(game.start_date)}
             </p>
             <p>
               <span className="text-muted-foreground">Cuota: </span>

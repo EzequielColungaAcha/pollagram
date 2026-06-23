@@ -10,9 +10,11 @@ import { archiveGame, closeGame, createGame, openGame } from "@/features/admin/m
 import {
   displayGameLabel,
   formatCurrency,
+  formatDate,
   formatDateTime,
   formatPercent,
   gameStatusLabel,
+  todayInAppTz,
 } from "@/lib/format";
 
 export function AdminGamesPage() {
@@ -21,6 +23,7 @@ export function AdminGamesPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [label, setLabel] = useState("");
+  const [startDate, setStartDate] = useState(todayInAppTz);
   const [entryFee, setEntryFee] = useState("");
   const [prizePercent, setPrizePercent] = useState("");
 
@@ -49,8 +52,14 @@ export function AdminGamesPage() {
     await run(async () => {
       const fee = entryFee.trim() ? Number(entryFee) : undefined;
       const pct = prizePercent.trim() ? Number(prizePercent) : undefined;
-      await createGame(label.trim() || undefined, fee, pct);
+      await createGame(
+        label.trim() || undefined,
+        fee,
+        pct,
+        startDate.trim() || undefined,
+      );
       setLabel("");
+      setStartDate(todayInAppTz());
       if (settings) {
         setEntryFee(String(Number(settings.entry_fee)));
         setPrizePercent(String(Number(settings.prize_percent)));
@@ -84,6 +93,15 @@ export function AdminGamesPage() {
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
                 maxLength={100}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="createStartDate">Fecha de inicio</Label>
+              <Input
+                id="createStartDate"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
               />
             </div>
             <div className="space-y-2">
@@ -142,7 +160,8 @@ export function AdminGamesPage() {
                     <Badge variant="outline">{gameStatusLabel(game.status)}</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    {game.player_count} jugadores · {formatCurrency(game.prize_pool)} · Cuota{" "}
+                    Inicio {formatDate(game.start_date)} · {game.player_count} jugadores ·{" "}
+                    {formatCurrency(game.prize_pool)} · Cuota{" "}
                     {formatCurrency(game.entry_fee)} · Premio{" "}
                     {formatPercent(Number(game.prize_percent) * 100)}
                     {game.created_at && ` · ${formatDateTime(game.created_at)}`}

@@ -176,6 +176,8 @@ Local config uses invite-only mode: `[auth].enable_signup = false` blocks public
 3. **Apply database migrations**
 
    ```bash
+   # Token: https://supabase.com/dashboard/account/tokens
+   SUPABASE_NO_KEYRING=1 pnpm exec supabase login --token sbp_YOUR_TOKEN
    pnpm exec supabase link --project-ref YOUR_PROJECT_REF
    pnpm exec supabase db push
    ```
@@ -264,12 +266,17 @@ Do this once (and again whenever migrations change).
 
    ```bash
    pnpm install
-   pnpm exec supabase login
+   # Create a token at https://supabase.com/dashboard/account/tokens
+   # Browser login stores the token in the OS keyring; db push still reads
+   # ~/.supabase/access-token — use --token so both paths work.
+   SUPABASE_NO_KEYRING=1 pnpm exec supabase login --token sbp_YOUR_TOKEN
    pnpm exec supabase link --project-ref YOUR_PROJECT_REF
    pnpm exec supabase db push
    ```
 
    Migrations live in `supabase/migrations/` (001–015). Alternative: run each SQL file in order in the Supabase SQL editor.
+
+   **If `db push` says "Access token not provided" after browser login:** run `pnpm exec supabase projects list` — if that works, re-login with `--token` as above (or `export SUPABASE_ACCESS_TOKEN=sbp_...` for the current shell).
 
 4. **Seed the admin user** (local machine only):
 
@@ -329,6 +336,7 @@ The repo includes [`.github/workflows/deploy-pages.yml`](.github/workflows/deplo
 | Routes 404 on refresh | Ensure `public/404.html` is deployed (included in build) |
 | Admin login fails | Supabase Auth Site URL must match the GitHub Pages URL |
 | RPC / draft game errors | Run `pnpm exec supabase db push` (migration 015 may be missing) |
+| `db push`: Access token not provided | Browser login uses the OS keyring; `db push` needs `~/.supabase/access-token`. Re-login with `SUPABASE_NO_KEYRING=1 pnpm exec supabase login --token sbp_...` |
 
 ### Frontend (Vercel)
 

@@ -45,11 +45,13 @@ export async function createGame(
   label?: string,
   entryFee?: number,
   prizePercent?: number,
+  startDate?: string,
 ) {
   const { data, error } = await supabase.rpc("rpc_create_game", {
     p_label: label?.trim() || undefined,
     p_entry_fee: entryFee,
     p_prize_percent: prizePercent,
+    p_start_date: startDate,
   });
   throwIfError(error);
   invalidateAll();
@@ -60,6 +62,7 @@ export async function updateGame(
   gameId: string,
   updates: {
     label?: string;
+    startDate?: string;
     entryFee?: number;
     prizePercent?: number;
   },
@@ -67,6 +70,7 @@ export async function updateGame(
   const { error } = await supabase.rpc("rpc_update_game", {
     p_game_id: gameId,
     p_label: updates.label?.trim(),
+    p_start_date: updates.startDate,
     p_entry_fee: updates.entryFee,
     p_prize_percent: updates.prizePercent,
   });
