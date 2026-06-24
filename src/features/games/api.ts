@@ -158,13 +158,15 @@ export async function fetchGameDetail(gameId: string): Promise<GameDetail> {
         .eq("id", w.entry_id)
         .single();
       let playerName = "—";
+      let playerNickname: string | null = null;
       if (entry) {
         const { data: player } = await supabase
           .from("players")
-          .select("name")
+          .select("name, nickname")
           .eq("id", entry.player_id)
           .single();
         playerName = player?.name ?? "—";
+        playerNickname = player?.nickname ?? null;
       }
       return {
         id: w.id,
@@ -173,6 +175,7 @@ export async function fetchGameDetail(gameId: string): Promise<GameDetail> {
         prize_amount: w.prize_amount,
         won_at: w.won_at,
         player_name: playerName,
+        player_nickname: playerNickname,
       };
     }),
   );

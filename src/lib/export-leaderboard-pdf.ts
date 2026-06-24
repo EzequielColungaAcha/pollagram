@@ -2,7 +2,7 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import type { OverflowType } from "jspdf-autotable";
 import {
-  displayPlayerName,
+  displayLeaderboardPlayerName,
   formatDateTime,
   formatNumber,
   sortPickNumbersAsc,
@@ -54,6 +54,7 @@ function computePdfColumnWidths(doc: jsPDF, names: string[]) {
 export function downloadLeaderboardPdf(
   entries: LeaderboardEntryWithNumbers[],
   title: string,
+  revealFullName = true,
 ): void {
   const sorted = [...entries].sort((a, b) =>
     a.player_name.localeCompare(b.player_name, "es"),
@@ -62,7 +63,12 @@ export function downloadLeaderboardPdf(
   const headers = ["#", "Jugador", ...Array.from({ length: 10 }, (_, i) => `N${i + 1}`)];
 
   const names = sorted.map((entry) =>
-    displayPlayerName(entry.player_name, entry.player_nickname),
+    displayLeaderboardPlayerName(
+      entry.player_name,
+      entry.player_nickname,
+      entry.rank,
+      revealFullName,
+    ),
   );
 
   const body = sorted.map((entry, index) => {

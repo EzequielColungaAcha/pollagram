@@ -22,12 +22,14 @@ import type { LeaderboardEntryWithNumbers } from "@/types/database";
 function GameLeaderboard({
   entries,
   isLoading,
+  revealFullName,
 }: {
   entries: LeaderboardEntryWithNumbers[];
   isLoading: boolean;
+  revealFullName: boolean;
 }) {
   if (isLoading) return <Skeleton className="h-48 w-full" />;
-  return <LeaderboardTable entries={entries} />;
+  return <LeaderboardTable entries={entries} revealFullName={revealFullName} />;
 }
 
 export function HomePage() {
@@ -49,6 +51,9 @@ export function HomePage() {
   const selectedIndex = activeGames.findIndex((g) => g.game.id === selectedId);
   const selected = selectedIndex >= 0 ? activeGames[selectedIndex] : undefined;
   const multipleGames = activeGames.length > 1;
+  const revealFullName =
+    selected != null &&
+    (selected.game.status === "closed" || selected.winnersCount > 0);
 
   const { data: leaderboard = [], isLoading: leaderboardLoading } =
     useLeaderboardWithNumbers(selected?.game.id);
@@ -149,6 +154,7 @@ export function HomePage() {
                   downloadLeaderboardXlsx(
                     leaderboard,
                     displayGameLabel(selected.game.label, selectedIndex + 1),
+                    revealFullName,
                   )
                 }
               >
@@ -163,6 +169,7 @@ export function HomePage() {
                   downloadLeaderboardPdf(
                     leaderboard,
                     displayGameLabel(selected.game.label, selectedIndex + 1),
+                    revealFullName,
                   )
                 }
               >
@@ -172,7 +179,11 @@ export function HomePage() {
             </div>
           </CardHeader>
           <CardContent className="pt-2">
-            <GameLeaderboard entries={leaderboard} isLoading={leaderboardLoading} />
+            <GameLeaderboard
+              entries={leaderboard}
+              isLoading={leaderboardLoading}
+              revealFullName={revealFullName}
+            />
           </CardContent>
         </Card>
       )}

@@ -57,6 +57,17 @@ export function displayPlayerName(name: string, nickname?: string | null): strin
   return nickname ? `${name} (${nickname})` : name;
 }
 
+export function displayLeaderboardPlayerName(
+  name: string,
+  nickname: string | null | undefined,
+  rank: number,
+  revealFullName: boolean,
+): string {
+  if (revealFullName) return displayPlayerName(name, nickname);
+  const trimmed = nickname?.trim();
+  return trimmed ? trimmed : `Jugador #${rank}`;
+}
+
 export function gameStatusLabel(status: string): string {
   const labels: Record<string, string> = {
     draft: "Borrador",

@@ -8,7 +8,7 @@ interface PickSlot {
 }
 
 const numberCircleClass =
-  "flex size-10 items-center justify-center rounded-full p-0 font-mono text-sm font-medium leading-none tabular-nums sm:size-11 sm:text-base";
+  "flex size-11 items-center justify-center rounded-full p-0 font-mono text-base font-bold leading-none tabular-nums sm:size-12 sm:text-lg";
 
 function NumberCircle({
   children,

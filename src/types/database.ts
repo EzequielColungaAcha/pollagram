@@ -139,7 +139,7 @@ export interface EntryWithDetails extends LeaderboardEntry {
 export interface GameDetail extends Game {
   entries: EntryWithDetails[];
   draws: Array<LotteryDraw & { numbers: DrawNumber[] }>;
-  winners: Array<Winner & { player_name: string }>;
+  winners: Array<Winner & { player_name: string; player_nickname: string | null }>;
 }
 
 export interface GlobalStats {

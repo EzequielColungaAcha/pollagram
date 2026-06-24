@@ -1,4 +1,4 @@
-import { displayPlayerName } from "@/lib/format";
+import { displayLeaderboardPlayerName } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { LeaderboardEntryWithNumbers } from "@/types/database";
 import { Badge } from "@/components/ui/badge";
@@ -6,9 +6,13 @@ import { PickSlotBadges } from "./pick-slot-badges";
 
 interface LeaderboardTableProps {
   entries: LeaderboardEntryWithNumbers[];
+  revealFullName?: boolean;
 }
 
-export function LeaderboardTable({ entries }: LeaderboardTableProps) {
+export function LeaderboardTable({
+  entries,
+  revealFullName = true,
+}: LeaderboardTableProps) {
   if (entries.length === 0) {
     return (
       <p className="py-12 text-center text-base text-muted-foreground">
@@ -38,7 +42,12 @@ export function LeaderboardTable({ entries }: LeaderboardTableProps) {
               </div>
               <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
                 <span className="truncate text-base font-medium sm:truncate-none">
-                  {displayPlayerName(entry.player_name, entry.player_nickname)}
+                  {displayLeaderboardPlayerName(
+                    entry.player_name,
+                    entry.player_nickname,
+                    entry.rank,
+                    revealFullName,
+                  )}
                 </span>
                 {entry.is_winner && <Badge variant="secondary">Ganador</Badge>}
               </div>

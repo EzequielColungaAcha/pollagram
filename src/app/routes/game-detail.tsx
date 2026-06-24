@@ -5,7 +5,7 @@ import { LeaderboardTable } from "@/components/public/leaderboard-table";
 import { NumberGrid } from "@/components/public/pick-slot-badges";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton, ErrorState } from "@/components/ui/feedback";
-import { formatCurrency, formatDate, formatDateTime, displayGameLabel } from "@/lib/format";
+import { formatCurrency, formatDate, formatDateTime, displayGameLabel, displayPlayerName } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 
 export function GameDetailPage() {
@@ -27,6 +27,7 @@ export function GameDetailPage() {
   }
 
   const winnersCount = data.entries.filter((e) => e.is_winner).length;
+  const revealFullName = data.status === "closed" || winnersCount > 0;
 
   return (
     <div className="space-y-10 md:space-y-12">
@@ -52,7 +53,7 @@ export function GameDetailPage() {
           <CardContent className="space-y-2">
             {data.winners.map((w) => (
               <div key={w.id} className="flex items-center justify-between text-sm">
-                <span>{w.player_name}</span>
+                <span>{displayPlayerName(w.player_name, w.player_nickname)}</span>
                 <Badge variant="secondary">{formatCurrency(w.prize_amount)}</Badge>
               </div>
             ))}
@@ -68,7 +69,7 @@ export function GameDetailPage() {
           {lbLoading ? (
             <Skeleton className="h-48" />
           ) : (
-            <LeaderboardTable entries={leaderboard ?? []} />
+            <LeaderboardTable entries={leaderboard ?? []} revealFullName={revealFullName} />
           )}
         </CardContent>
       </Card>
