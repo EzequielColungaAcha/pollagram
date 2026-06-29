@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CycleSummaryCards } from "@/components/public/cycle-summary-cards";
 import { LeaderboardTable } from "@/components/public/leaderboard-table";
 import { AddPlayerModal } from "@/components/admin/add-player-modal";
+import { EditPlayerModal } from "@/components/admin/edit-player-modal";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +16,7 @@ import {
   useGameDetail,
   useLeaderboardWithNumbers,
 } from "@/features/games/hooks";
-import { closeGame, openGame, updateGame } from "@/features/admin/mutations";
+import { closeGame, deletePlayerEntry, openGame, updateGame } from "@/features/admin/mutations";
 import { useQueryClient } from "@tanstack/react-query";
 import { displayGameLabel, formatCurrency, formatDate, formatPercent, gameStatusLabel } from "@/lib/format";
 import {
@@ -23,6 +24,7 @@ import {
   type UpdateGameFormValues,
 } from "@/validation/schemas";
 import { useEffect } from "react";
+import type { LeaderboardEntryWithNumbers } from "@/types/database";
 
 export function AdminGameDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -30,6 +32,7 @@ export function AdminGameDetailPage() {
   const { data: game, isLoading, error, refetch } = useGameDetail(id);
   const { data: leaderboard, isLoading: lbLoading } = useLeaderboardWithNumbers(id);
   const [modalOpen, setModalOpen] = useState(false);
+  const [editingEntry, setEditingEntry] = useState<LeaderboardEntryWithNumbers | null>(null);
   const [closing, setClosing] = useState(false);
   const [opening, setOpening] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -120,6 +123,13 @@ export function AdminGameDetailPage() {
     queryClient.invalidateQueries();
   };
 
+  const handleDeletePlayer = async (entry: LeaderboardEntryWithNumbers) => {
+    const label = entry.player_nickname ?? entry.player_name;
+    if (!confirm(`¿Eliminar a ${label} de este juego?`)) return;
+    await deletePlayerEntry(entry.entry_id);
+    invalidate();
+  };
+
   return (
     <div className="space-y-10 md:space-y-12">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -144,7 +154,7 @@ export function AdminGameDetailPage() {
           )}
         </div>
         <div className="flex flex-wrap gap-2">
-          {canManage && (
+          {isDraft && (
             <Button onClick={() => setModalOpen(true)}>Agregar jugador</Button>
           )}
           {isDraft && (
@@ -270,15 +280,27 @@ export function AdminGameDetailPage() {
           {lbLoading ? (
             <Skeleton className="h-48" />
           ) : (
-            <LeaderboardTable entries={leaderboard ?? []} />
+            <LeaderboardTable
+              entries={leaderboard ?? []}
+              editable={isDraft}
+              onEdit={setEditingEntry}
+              onDelete={handleDeletePlayer}
+            />
           )}
         </CardContent>
       </Card>
 
       <AddPlayerModal
         gameId={game.id}
-        open={modalOpen && canManage}
+        open={modalOpen && isDraft}
         onClose={() => setModalOpen(false)}
+        onSuccess={invalidate}
+      />
+
+      <EditPlayerModal
+        entry={editingEntry}
+        open={editingEntry !== null}
+        onClose={() => setEditingEntry(null)}
         onSuccess={invalidate}
       />
     </div>

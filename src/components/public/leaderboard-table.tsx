@@ -2,16 +2,23 @@ import { displayLeaderboardPlayerName } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { LeaderboardEntryWithNumbers } from "@/types/database";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { PickSlotBadges } from "./pick-slot-badges";
 
 interface LeaderboardTableProps {
   entries: LeaderboardEntryWithNumbers[];
   revealFullName?: boolean;
+  editable?: boolean;
+  onEdit?: (entry: LeaderboardEntryWithNumbers) => void;
+  onDelete?: (entry: LeaderboardEntryWithNumbers) => void;
 }
 
 export function LeaderboardTable({
   entries,
   revealFullName = true,
+  editable = false,
+  onEdit,
+  onDelete,
 }: LeaderboardTableProps) {
   if (entries.length === 0) {
     return (
@@ -55,6 +62,28 @@ export function LeaderboardTable({
 
             <PickSlotBadges numbers={entry.numbers} />
           </div>
+
+          {editable && (
+            <div className="flex shrink-0 gap-2 sm:flex-col sm:items-end">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => onEdit?.(entry)}
+              >
+                Editar
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="text-destructive hover:text-destructive"
+                onClick={() => onDelete?.(entry)}
+              >
+                Eliminar
+              </Button>
+            </div>
+          )}
         </li>
       ))}
     </ul>

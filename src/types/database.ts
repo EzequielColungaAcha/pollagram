@@ -4,6 +4,7 @@ export type AuditAction =
   | "player_created"
   | "player_updated"
   | "entry_created"
+  | "entry_deleted"
   | "numbers_edited"
   | "draw_entered"
   | "draw_invalidated"

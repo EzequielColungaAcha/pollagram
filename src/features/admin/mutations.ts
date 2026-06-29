@@ -144,6 +144,28 @@ export async function editEntryNumbers(entryId: string, numbers: number[]) {
   invalidateAll();
 }
 
+export async function updatePlayerEntry(
+  entryId: string,
+  updates: { name: string; numbers: number[]; nickname?: string },
+) {
+  const { error } = await supabase.rpc("rpc_update_player_entry", {
+    p_entry_id: entryId,
+    p_name: updates.name,
+    p_numbers: updates.numbers,
+    p_nickname: updates.nickname ?? undefined,
+  });
+  throwIfError(error);
+  invalidateAll();
+}
+
+export async function deletePlayerEntry(entryId: string) {
+  const { error } = await supabase.rpc("rpc_delete_player_entry", {
+    p_entry_id: entryId,
+  });
+  throwIfError(error);
+  invalidateAll();
+}
+
 export async function enterDraw(drawDate: string, numbers: number[]) {
   const { data, error } = await supabase.rpc("rpc_enter_draw", {
     p_draw_date: drawDate,

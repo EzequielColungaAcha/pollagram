@@ -233,6 +233,19 @@ export interface Database {
         Args: { p_entry_id: string; p_numbers: number[] };
         Returns: undefined;
       };
+      rpc_update_player_entry: {
+        Args: {
+          p_entry_id: string;
+          p_name: string;
+          p_numbers: number[];
+          p_nickname?: string;
+        };
+        Returns: undefined;
+      };
+      rpc_delete_player_entry: {
+        Args: { p_entry_id: string };
+        Returns: undefined;
+      };
       rpc_update_settings: {
         Args: { p_entry_fee: number; p_prize_percent: number };
         Returns: undefined;

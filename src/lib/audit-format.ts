@@ -23,6 +23,7 @@ const ACTION_LABELS: Record<string, string> = {
   player_created: "Jugador creado",
   player_updated: "Jugador actualizado",
   entry_created: "Entrada registrada",
+  entry_deleted: "Entrada eliminada",
   numbers_edited: "Números editados",
   draw_entered: "Sorteo registrado",
   draw_invalidated: "Sorteo invalidado",
