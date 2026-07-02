@@ -157,6 +157,11 @@ export interface GlobalStats {
   progressDistribution: Array<{ matched: number; count: number }>;
 }
 
+export interface GameChartStats {
+  dailyMatches: Array<{ date: string; matches: number }>;
+  progressDistribution: Array<{ matched: number; count: number }>;
+}
+
 export interface GameHistoryFilters {
   page?: number;
   pageSize?: number;

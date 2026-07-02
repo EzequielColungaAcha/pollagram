@@ -12,6 +12,7 @@ import {
 } from "@/components/charts";
 import {
   useActiveGames,
+  useGameChartStats,
   useGlobalStats,
   useLeaderboardWithNumbers,
 } from "@/features/games/hooks";
@@ -28,6 +29,7 @@ export function AdminDashboardPage() {
   const { data: activeGames = [], isLoading } = useActiveGames();
   const [selectedId, setSelectedId] = useState("");
   const { data: stats } = useGlobalStats();
+  const { data: gameStats } = useGameChartStats(selectedId);
 
   useEffect(() => {
     if (activeGames.length > 0 && !selectedId) {
@@ -91,7 +93,7 @@ export function AdminDashboardPage() {
             <CardTitle className="text-base">Progresión diaria</CardTitle>
           </CardHeader>
           <CardContent>
-            <ChartDailyMatches data={stats?.dailyMatches ?? []} />
+            <ChartDailyMatches data={gameStats?.dailyMatches ?? []} />
           </CardContent>
         </Card>
         <Card>
@@ -99,7 +101,7 @@ export function AdminDashboardPage() {
             <CardTitle className="text-base">Distribución de progreso</CardTitle>
           </CardHeader>
           <CardContent>
-            <ChartPlayerProgress data={stats?.progressDistribution ?? []} />
+            <ChartPlayerProgress data={gameStats?.progressDistribution ?? []} />
           </CardContent>
         </Card>
         <Card>

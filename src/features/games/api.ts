@@ -4,6 +4,7 @@ import type {
   AuditLog,
   Game,
   GameDetail,
+  GameChartStats,
   GameHistoryFilters,
   GameSummary,
   GlobalStats,
@@ -364,6 +365,49 @@ export async function fetchGlobalStats(): Promise<GlobalStats> {
     dailyMatches,
     progressDistribution,
   };
+}
+
+export async function fetchGameChartStats(
+  gameId: string,
+): Promise<GameChartStats> {
+  const { data: matches } = await supabase
+    .from("matches")
+    .select("draw_id, player_entries!inner(game_id)")
+    .eq("player_entries.game_id", gameId);
+  const { data: draws } = await supabase
+    .from("lottery_draws")
+    .select("id, draw_date")
+    .eq("is_invalidated", false);
+
+  const drawDateMap = new Map(
+    (draws ?? []).map((d) => [d.id, d.draw_date]),
+  );
+  const dailyMatchMap = new Map<string, number>();
+  for (const m of matches ?? []) {
+    const date = drawDateMap.get(m.draw_id);
+    if (date) dailyMatchMap.set(date, (dailyMatchMap.get(date) ?? 0) + 1);
+  }
+  const dailyMatches = [...dailyMatchMap.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .slice(-14)
+    .map(([date, matches]) => ({ date, matches }));
+
+  const { data: entries } = await supabase
+    .from("player_entries")
+    .select("matched_count")
+    .eq("game_id", gameId);
+  const progressDistributionMap = new Map<number, number>();
+  for (const e of entries ?? []) {
+    progressDistributionMap.set(
+      e.matched_count,
+      (progressDistributionMap.get(e.matched_count) ?? 0) + 1,
+    );
+  }
+  const progressDistribution = [...progressDistributionMap.entries()]
+    .sort(([a], [b]) => a - b)
+    .map(([matched, count]) => ({ matched, count }));
+
+  return { dailyMatches, progressDistribution };
 }
 
 export async function fetchSettings() {

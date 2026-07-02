@@ -21,6 +21,7 @@ export const queryKeys = {
   gameHistory: (filters: Record<string, unknown>) =>
     ["gameHistory", filters] as const,
   globalStats: ["globalStats"] as const,
+  gameChartStats: (gameId: string) => ["gameChartStats", gameId] as const,
   settings: ["settings"] as const,
   players: ["players"] as const,
   draws: ["draws"] as const,

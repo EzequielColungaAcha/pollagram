@@ -7,6 +7,7 @@ import {
   fetchAuditLogs,
   fetchDraws,
   fetchGameDetail,
+  fetchGameChartStats,
   fetchGameHistory,
   fetchGlobalStats,
   fetchLeaderboard,
@@ -65,6 +66,15 @@ export function useGlobalStats() {
   return useQuery({
     queryKey: queryKeys.globalStats,
     queryFn: fetchGlobalStats,
+    staleTime: 300_000,
+  });
+}
+
+export function useGameChartStats(gameId: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.gameChartStats(gameId ?? ""),
+    queryFn: () => fetchGameChartStats(gameId!),
+    enabled: !!gameId,
     staleTime: 300_000,
   });
 }
