@@ -2,9 +2,11 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import type { OverflowType } from "jspdf-autotable";
 import {
+  comparePlayerSortKeys,
   displayLeaderboardPlayerName,
   formatDateTime,
   formatNumber,
+  playerSortKey,
   sortPickNumbersAsc,
 } from "@/lib/format";
 import type { LeaderboardEntryWithNumbers } from "@/types/database";
@@ -57,7 +59,10 @@ export function downloadLeaderboardPdf(
   revealFullName = true,
 ): void {
   const sorted = [...entries].sort((a, b) =>
-    a.player_name.localeCompare(b.player_name, "es"),
+    comparePlayerSortKeys(
+      playerSortKey(a.player_name, a.player_nickname),
+      playerSortKey(b.player_name, b.player_nickname),
+    ),
   );
 
   const headers = ["#", "Jugador", ...Array.from({ length: 10 }, (_, i) => `N${i + 1}`)];

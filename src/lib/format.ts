@@ -53,6 +53,15 @@ export function sortPickNumbersAsc<T extends { number: number }>(items: T[]): T[
   return [...items].sort((a, b) => a.number - b.number);
 }
 
+export function playerSortKey(name: string, nickname?: string | null): string {
+  const trimmed = nickname?.trim();
+  return trimmed || name;
+}
+
+export function comparePlayerSortKeys(a: string, b: string): number {
+  return a.localeCompare(b, "es", { numeric: true, sensitivity: "base" });
+}
+
 export function displayPlayerName(name: string, nickname?: string | null): string {
   return nickname ? `${name} (${nickname})` : name;
 }

@@ -1,5 +1,11 @@
 import * as XLSX from "xlsx";
-import { displayLeaderboardPlayerName, formatNumber, sortPickNumbersAsc } from "@/lib/format";
+import {
+  comparePlayerSortKeys,
+  displayLeaderboardPlayerName,
+  formatNumber,
+  playerSortKey,
+  sortPickNumbersAsc,
+} from "@/lib/format";
 import type { LeaderboardEntryWithNumbers } from "@/types/database";
 
 function sanitizeFilename(label: string): string {
@@ -17,7 +23,10 @@ export function downloadLeaderboardXlsx(
   revealFullName = true,
 ): void {
   const sorted = [...entries].sort((a, b) =>
-    a.player_name.localeCompare(b.player_name, "es"),
+    comparePlayerSortKeys(
+      playerSortKey(a.player_name, a.player_nickname),
+      playerSortKey(b.player_name, b.player_nickname),
+    ),
   );
 
   const rows = sorted.map((entry, index) => {
