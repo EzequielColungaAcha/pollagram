@@ -145,13 +145,13 @@ export function AdminGameDetailPage() {
               <Badge variant="secondary">{gameStatusLabel(game.status)}</Badge>
             )}
           </div>
-          {!isActive && (
-            <p className="mt-1 text-sm text-muted-foreground">
-              {isDraft
-                ? "Borrador — no visible públicamente hasta activar."
+          <p className="mt-1 text-sm text-muted-foreground">
+            {isDraft
+              ? "Borrador — no visible públicamente hasta activar."
+              : isActive
+                ? "Activo — los jugadores pueden editarse o eliminarse."
                 : "Solo lectura — el juego ya no admite cambios."}
-            </p>
-          )}
+          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           {isDraft && (
@@ -282,7 +282,7 @@ export function AdminGameDetailPage() {
           ) : (
             <LeaderboardTable
               entries={leaderboard ?? []}
-              editable={isDraft}
+              editable={canManage}
               onEdit={setEditingEntry}
               onDelete={handleDeletePlayer}
             />
