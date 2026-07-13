@@ -149,12 +149,12 @@ export function AdminGameDetailPage() {
             {isDraft
               ? "Borrador — no visible públicamente hasta activar."
               : isActive
-                ? "Activo — los jugadores pueden editarse o eliminarse."
+                ? "Activo — los jugadores pueden agregarse, editarse o eliminarse."
                 : "Solo lectura — el juego ya no admite cambios."}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          {isDraft && (
+          {canManage && (
             <Button onClick={() => setModalOpen(true)}>Agregar jugador</Button>
           )}
           {isDraft && (
@@ -292,7 +292,7 @@ export function AdminGameDetailPage() {
 
       <AddPlayerModal
         gameId={game.id}
-        open={modalOpen && isDraft}
+        open={modalOpen && canManage}
         onClose={() => setModalOpen(false)}
         onSuccess={invalidate}
       />

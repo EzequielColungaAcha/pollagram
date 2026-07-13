@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { Input } from "@/components/ui/input";
-import { parseNumberInput } from "@/validation/schemas";
+import { formatNumberInput, parseNumberInput } from "@/validation/schemas";
 import { cn } from "@/lib/utils";
 
 function digitsOnly(raw: string): string {
@@ -52,11 +52,24 @@ export function SlotNumberInput({
 
   useEffect(() => {
     if (value.every((n) => n == null)) {
-      const empty = Array(count).fill("");
-      setSlots(empty);
+      setSlots((prev) => {
+        if (prev.every((s) => s === "")) return prev;
+        const empty = Array(count).fill("");
+        onRawChangeRef.current?.(empty);
+        return empty;
+      });
       setInvalidSlots(new Set());
-      onRawChangeRef.current?.(empty);
+      return;
     }
+
+    setSlots((prev) => {
+      const inSync = value.every((n, i) => n === slotToNumber(prev[i] ?? ""));
+      if (inSync) return prev;
+      const next = value.map((n) => (n == null ? "" : formatNumberInput(n)));
+      onRawChangeRef.current?.(next);
+      return next;
+    });
+    setInvalidSlots(new Set());
   }, [value, count]);
 
   const update = (index: number, raw: string) => {
