@@ -16,9 +16,11 @@ import {
   fetchLeaderboardWithNumbers,
 } from "@/features/games/api";
 import {
+  comparePlayerSortKeys,
   displayGameLabel,
   displayPlayerName,
   formatNumber,
+  playerSortKey,
 } from "@/lib/format";
 import type { Game, LeaderboardEntryWithNumbers } from "@/types/database";
 
@@ -50,7 +52,15 @@ export function ImportFromArchivedModal({
   );
 
   const available = useMemo(
-    () => entries.filter((e) => !currentIds.has(e.player_id)),
+    () =>
+      entries
+        .filter((e) => !currentIds.has(e.player_id))
+        .sort((a, b) =>
+          comparePlayerSortKeys(
+            playerSortKey(a.player_name, a.player_nickname),
+            playerSortKey(b.player_name, b.player_nickname),
+          ),
+        ),
     [entries, currentIds],
   );
 
