@@ -6,6 +6,7 @@ import { CycleSummaryCards } from "@/components/public/cycle-summary-cards";
 import { LeaderboardTable } from "@/components/public/leaderboard-table";
 import { AddPlayerModal } from "@/components/admin/add-player-modal";
 import { EditPlayerModal } from "@/components/admin/edit-player-modal";
+import { ImportFromArchivedModal } from "@/components/admin/import-from-archived-modal";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +33,7 @@ export function AdminGameDetailPage() {
   const { data: game, isLoading, error, refetch } = useGameDetail(id);
   const { data: leaderboard, isLoading: lbLoading } = useLeaderboardWithNumbers(id);
   const [modalOpen, setModalOpen] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<LeaderboardEntryWithNumbers | null>(null);
   const [closing, setClosing] = useState(false);
   const [opening, setOpening] = useState(false);
@@ -155,7 +157,12 @@ export function AdminGameDetailPage() {
         </div>
         <div className="flex flex-wrap gap-2">
           {canManage && (
-            <Button onClick={() => setModalOpen(true)}>Agregar jugador</Button>
+            <>
+              <Button onClick={() => setModalOpen(true)}>Agregar jugador</Button>
+              <Button variant="outline" onClick={() => setImportModalOpen(true)}>
+                Del último archivado
+              </Button>
+            </>
           )}
           {isDraft && (
             <Button disabled={opening} onClick={handleOpen}>
@@ -294,6 +301,14 @@ export function AdminGameDetailPage() {
         gameId={game.id}
         open={modalOpen && canManage}
         onClose={() => setModalOpen(false)}
+        onSuccess={invalidate}
+      />
+
+      <ImportFromArchivedModal
+        gameId={game.id}
+        currentPlayerIds={(leaderboard ?? []).map((e) => e.player_id)}
+        open={importModalOpen && canManage}
+        onClose={() => setImportModalOpen(false)}
         onSuccess={invalidate}
       />
 

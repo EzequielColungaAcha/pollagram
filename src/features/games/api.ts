@@ -488,3 +488,16 @@ export async function fetchAllGames() {
   if (error) throw error;
   return data ?? [];
 }
+
+export async function fetchLastArchivedGame(): Promise<Game | null> {
+  const { data, error } = await supabase
+    .from("games")
+    .select("*")
+    .eq("status", "archived")
+    .order("closed_at", { ascending: false, nullsFirst: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw error;
+  return (data as Game | null) ?? null;
+}
