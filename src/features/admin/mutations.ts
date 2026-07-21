@@ -124,6 +124,7 @@ export async function createEntry(
   playerId: string,
   gameId: string,
   numbers: number[],
+  options?: { invalidate?: boolean },
 ) {
   const { data, error } = await supabase.rpc("rpc_create_entry", {
     p_player_id: playerId,
@@ -131,7 +132,7 @@ export async function createEntry(
     p_numbers: numbers,
   });
   throwIfError(error);
-  invalidateAll();
+  if (options?.invalidate !== false) invalidateAll();
   return data;
 }
 

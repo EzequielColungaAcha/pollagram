@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Skeleton } from "@/components/ui/feedback";
+import { Skeleton, Spinner } from "@/components/ui/feedback";
 import { createEntry } from "@/features/admin/mutations";
 import {
   fetchLastArchivedGame,
@@ -44,6 +44,7 @@ export function ImportFromArchivedModal({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [progress, setProgress] = useState({ done: 0, total: 0 });
   const [error, setError] = useState<string | null>(null);
 
   const currentIds = useMemo(
@@ -78,6 +79,7 @@ export function ImportFromArchivedModal({
     setSelected(new Set());
     setArchivedGame(null);
     setEntries([]);
+    setProgress({ done: 0, total: 0 });
 
     (async () => {
       try {
@@ -108,9 +110,12 @@ export function ImportFromArchivedModal({
     };
   }, [open]);
 
-  const close = () => {
+  const close = (force = false) => {
+    if (submitting && !force) return;
     setSelected(new Set());
     setError(null);
+    setProgress({ done: 0, total: 0 });
+    setSubmitting(false);
     onClose();
   };
 
@@ -130,32 +135,45 @@ export function ImportFromArchivedModal({
   const clearSelection = () => setSelected(new Set());
 
   const onSubmit = async () => {
-    if (selected.size === 0) return;
+    if (selected.size === 0 || submitting) return;
+    const toAdd = available.filter((e) => selected.has(e.player_id));
     setSubmitting(true);
     setError(null);
+    setProgress({ done: 0, total: toAdd.length });
+    let added = 0;
     try {
-      const toAdd = available.filter((e) => selected.has(e.player_id));
       for (const entry of toAdd) {
         await createEntry(
           entry.player_id,
           gameId,
           entry.numbers.map((n) => n.number),
+          { invalidate: false },
         );
+        added += 1;
+        setProgress({ done: added, total: toAdd.length });
       }
-      close();
+      close(true);
       onSuccess?.();
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Error al agregar jugadores",
       );
-    } finally {
       setSubmitting(false);
+      if (added > 0) onSuccess?.();
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={(next) => !next && close()}>
-      <DialogContent className="max-w-2xl">
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) close();
+      }}
+    >
+      <DialogContent
+        className="max-w-2xl"
+        showCloseButton={!submitting}
+      >
         <DialogHeader>
           <DialogTitle>Del último archivado</DialogTitle>
           <DialogDescription>
@@ -167,6 +185,13 @@ export function ImportFromArchivedModal({
 
         {loading ? (
           <Skeleton className="h-48 w-full" />
+        ) : submitting ? (
+          <div className="flex h-48 flex-col items-center justify-center gap-3">
+            <Spinner className="size-8" />
+            <p className="text-sm text-muted-foreground">
+              Agregando {progress.done} de {progress.total}…
+            </p>
+          </div>
         ) : error && !archivedGame ? (
           <Alert variant="destructive">
             <AlertDescription>{error}</AlertDescription>
@@ -191,7 +216,6 @@ export function ImportFromArchivedModal({
                 variant="outline"
                 size="sm"
                 onClick={selectAll}
-                disabled={submitting}
               >
                 Seleccionar todos
               </Button>
@@ -200,7 +224,7 @@ export function ImportFromArchivedModal({
                 variant="ghost"
                 size="sm"
                 onClick={clearSelection}
-                disabled={submitting || selected.size === 0}
+                disabled={selected.size === 0}
               >
                 Limpiar
               </Button>
@@ -224,7 +248,6 @@ export function ImportFromArchivedModal({
                         className="mt-1 size-4 shrink-0"
                         checked={checked}
                         onChange={() => toggle(entry.player_id)}
-                        disabled={submitting}
                       />
                       <span className="min-w-0 flex-1">
                         <span className="block text-sm font-medium">
@@ -254,7 +277,7 @@ export function ImportFromArchivedModal({
           </div>
         )}
 
-        {error && archivedGame && (
+        {error && archivedGame && !submitting && (
           <Alert variant="destructive">
             <AlertDescription>{error}</AlertDescription>
           </Alert>
