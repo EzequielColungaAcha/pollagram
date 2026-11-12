@@ -287,7 +287,7 @@ export function ImportFromArchivedModal({
           <Button
             type="button"
             variant="outline"
-            onClick={close}
+            onClick={() => close()}
             disabled={submitting}
           >
             Cancelar
