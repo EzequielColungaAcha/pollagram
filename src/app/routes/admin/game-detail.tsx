@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CycleSummaryCards } from "@/components/public/cycle-summary-cards";
@@ -17,7 +17,13 @@ import {
   useGameDetail,
   useLeaderboardWithNumbers,
 } from "@/features/games/hooks";
-import { closeGame, deletePlayerEntry, openGame, updateGame } from "@/features/admin/mutations";
+import {
+  closeGame,
+  deleteGame,
+  deletePlayerEntry,
+  openGame,
+  updateGame,
+} from "@/features/admin/mutations";
 import { useQueryClient } from "@tanstack/react-query";
 import { displayGameLabel, formatCurrency, formatDate, formatPercent, gameStatusLabel } from "@/lib/format";
 import {
@@ -29,6 +35,7 @@ import type { LeaderboardEntryWithNumbers } from "@/types/database";
 
 export function AdminGameDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: game, isLoading, error, refetch } = useGameDetail(id);
   const { data: leaderboard, isLoading: lbLoading } = useLeaderboardWithNumbers(id);
@@ -37,6 +44,7 @@ export function AdminGameDetailPage() {
   const [editingEntry, setEditingEntry] = useState<LeaderboardEntryWithNumbers | null>(null);
   const [closing, setClosing] = useState(false);
   const [opening, setOpening] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
@@ -99,6 +107,24 @@ export function AdminGameDetailPage() {
       await refetch();
     } finally {
       setClosing(false);
+    }
+  };
+
+  const handleDeleteGame = async () => {
+    if (
+      !confirm(
+        "¿Eliminar este borrador? Se borrarán jugadores y números asociados.",
+      )
+    ) {
+      return;
+    }
+    setDeleting(true);
+    try {
+      await deleteGame(game.id);
+      navigate("/admin/games");
+    } catch (err) {
+      setSaveMessage(err instanceof Error ? err.message : "Error al eliminar");
+      setDeleting(false);
     }
   };
 
@@ -165,9 +191,18 @@ export function AdminGameDetailPage() {
             </>
           )}
           {isDraft && (
-            <Button disabled={opening} onClick={handleOpen}>
-              {opening ? "Activando…" : "Activar juego"}
-            </Button>
+            <>
+              <Button disabled={opening || deleting} onClick={handleOpen}>
+                {opening ? "Activando…" : "Activar juego"}
+              </Button>
+              <Button
+                variant="destructive"
+                disabled={opening || deleting}
+                onClick={handleDeleteGame}
+              >
+                {deleting ? "Eliminando…" : "Eliminar"}
+              </Button>
+            </>
           )}
           {isActive && (
             <>

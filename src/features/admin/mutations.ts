@@ -103,6 +103,14 @@ export async function archiveGame(gameId: string) {
   invalidateAll();
 }
 
+export async function deleteGame(gameId: string) {
+  const { error } = await supabase.rpc("rpc_delete_game", {
+    p_game_id: gameId,
+  });
+  throwIfError(error);
+  invalidateAll();
+}
+
 export async function registerPlayerEntry(
   gameId: string,
   name: string,
@@ -179,6 +187,22 @@ export async function enterDraw(drawDate: string, numbers: number[]) {
 
 export async function invalidateDraw(drawId: string) {
   const { data, error } = await supabase.rpc("rpc_invalidate_draw", {
+    p_draw_id: drawId,
+  });
+  throwIfError(error);
+  invalidateAll();
+  return data;
+}
+
+export async function reprocessActiveMatches() {
+  const { data, error } = await supabase.rpc("rpc_reprocess_active_matches");
+  throwIfError(error);
+  invalidateAll();
+  return data;
+}
+
+export async function reprocessDraw(drawId: string) {
+  const { data, error } = await supabase.rpc("rpc_reprocess_draw", {
     p_draw_id: drawId,
   });
   throwIfError(error);

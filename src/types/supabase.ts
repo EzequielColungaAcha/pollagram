@@ -221,6 +221,9 @@ export interface Database {
       rpc_open_game: { Args: { p_game_id: string }; Returns: undefined };
       rpc_close_game: { Args: { p_game_id: string }; Returns: Json };
       rpc_archive_game: { Args: { p_game_id: string }; Returns: undefined };
+      rpc_delete_game: { Args: { p_game_id: string }; Returns: undefined };
+      rpc_reprocess_active_matches: { Args: Record<string, never>; Returns: Json };
+      rpc_reprocess_draw: { Args: { p_draw_id: string }; Returns: Json };
       rpc_create_entry: {
         Args: {
           p_player_id: string;

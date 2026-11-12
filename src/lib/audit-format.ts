@@ -65,12 +65,16 @@ const FIELD_LABELS: Record<string, string> = {
   has_winners: "Tiene ganadores",
   original_status: "Estado original",
   action: "Acción",
+  games_processed: "Juegos procesados",
+  player_count: "Jugadores",
 };
 
 const REASON_LABELS: Record<string, string> = {
   winner_detected: "ganador detectado",
   no_winners: "sin ganadores",
   matches_reprocessed: "aciertos reprocesados",
+  game_deleted: "juego eliminado",
+  draw_reprocessed: "sorteo revalidado",
 };
 
 const SCOPE_LABELS: Record<string, string> = {

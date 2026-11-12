@@ -6,7 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAllGames, useSettings } from "@/features/games/hooks";
-import { archiveGame, closeGame, createGame, openGame } from "@/features/admin/mutations";
+import {
+  archiveGame,
+  closeGame,
+  createGame,
+  deleteGame,
+  openGame,
+} from "@/features/admin/mutations";
 import {
   displayGameLabel,
   formatCurrency,
@@ -183,6 +189,23 @@ export function AdminGamesPage() {
                         onClick={() => run(() => openGame(game.id))}
                       >
                         Activar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        disabled={loading}
+                        onClick={() => {
+                          if (
+                            !confirm(
+                              "¿Eliminar este borrador? Se borrarán jugadores y números asociados.",
+                            )
+                          ) {
+                            return;
+                          }
+                          void run(() => deleteGame(game.id));
+                        }}
+                      >
+                        Eliminar
                       </Button>
                     </>
                   )}
